@@ -16,4 +16,5 @@ jobs:
       - run: npx oxlint src
       - run: npm run build
       - run: pip install playwright && python -m playwright install --with-deps chromium
-      - run: python tests/app.test.py
+      - run: python tests/app.test.py 2>&1 | tee salida.txt; r=${PIPESTATUS[0]}; grep -E "Error|error" salida.txt | tail -3 | sed "s/^/::error::/"; exit $r
+        shell: bash

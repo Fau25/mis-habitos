@@ -13,7 +13,7 @@ fallos, n = [], 0
 def ok(c, msg):
     global n; n += 1
     print(('  ✓ ' if c else '  ✗ ') + msg)
-    if not c: fallos.append(msg)
+    if not c: fallos.append(msg); print(f'::error::{msg}')
 def hab(id, nombre, **k):
     return {'id': id, 'nombre': nombre, 'desc': '', 'icono': 'gota', 'categoria': 'salud', 'frecuencia': 'diario', 'dias': [], 'momento': 'manana', 'creado': K(30), 'hechos': {}, **k}
 def poner(pg, hs, raw=None):
