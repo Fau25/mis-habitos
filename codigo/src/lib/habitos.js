@@ -7,13 +7,14 @@ export const ICONOS = { gota: Droplet, hoja: Leaf, pastilla: Pill, cama: BedDoub
   sinmovil: PhoneOff, brote: Sprout, cafe: Coffee, perro: Dog, corazon: HeartPulse, trabajo: Briefcase, bici: Bike,
   diana: Target, chispa: Sparkles }
 
+// Pastel por categoría: `suave` = fondo, `fuerte` = icono, puntos y barras (≥ 3,9:1 sobre el suave, ≥ 4,5:1 sobre blanco)
 export const CATEGORIAS = {
-  salud:         { nombre: 'Salud',         icono: 'corazon' },
-  productividad: { nombre: 'Productividad', icono: 'trabajo' },
-  bienestar:     { nombre: 'Bienestar',     icono: 'hoja' },
-  finanzas:      { nombre: 'Finanzas',      icono: 'hucha' },
-  aprendizaje:   { nombre: 'Aprendizaje',   icono: 'libro' },
-  otros:         { nombre: 'Otros',         icono: 'chispa' },
+  salud:         { nombre: 'Salud',         icono: 'corazon', suave: '#FBE3EC', fuerte: '#B84D74' },
+  productividad: { nombre: 'Productividad', icono: 'trabajo', suave: '#E0EAF9', fuerte: '#4A70B0' },
+  bienestar:     { nombre: 'Bienestar',     icono: 'hoja',    suave: '#EBE5F9', fuerte: '#7559BD' },
+  finanzas:      { nombre: 'Finanzas',      icono: 'hucha',   suave: '#FAEDCF', fuerte: '#97700F' },
+  aprendizaje:   { nombre: 'Aprendizaje',   icono: 'libro',   suave: '#DFF0E2', fuerte: '#3F7F4F' },
+  otros:         { nombre: 'Otros',         icono: 'chispa',  suave: '#EDE9E3', fuerte: '#756C60' },
 }
 export const cat = (h) => CATEGORIAS[h.categoria] ?? CATEGORIAS.otros
 export const nombreIcono = (h) => (ICONOS[h.icono] ? h.icono : cat(h).icono)

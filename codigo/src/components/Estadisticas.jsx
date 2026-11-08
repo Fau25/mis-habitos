@@ -1,4 +1,4 @@
-import { porcentaje, porcentajeGlobal, rachaActual, rachaRecord, rachasGenerales, resumenDia } from '../lib/habitos'
+import { cat, porcentaje, porcentajeGlobal, rachaActual, rachaRecord, rachasGenerales, resumenDia } from '../lib/habitos'
 import { IconoHabito } from './Habito'
 import { DIAS, clave, sumarDias, hoy, lunesDe } from '../lib/fechas'
 
@@ -62,13 +62,13 @@ export default function Estadisticas({ habitos }) {
           <div className="mt-5 mb-2 flex justify-between px-1 text-[13px] text-sec"><span>Por hábito · 30 días</span><span>racha / récord</span></div>
           <ul className="overflow-hidden rounded-2xl border border-linea bg-carta">
             {habitos.map((h) => {
-              const p = porcentaje(h, 30)
+              const p = porcentaje(h, 30), { suave, fuerte } = cat(h)
               return (
                 <li key={h.id} className="flex items-center gap-3 border-t border-linea px-3.5 py-3 first:border-t-0">
-                  <IconoHabito h={h} size={17} className="shrink-0 text-sec" />
+                  <span className="grid size-8 shrink-0 place-items-center rounded-[9px]" style={{ background: suave, color: fuerte }}><IconoHabito h={h} size={16} /></span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">{h.nombre}</p>
-                    <div className="mt-2 h-1 overflow-hidden rounded-full bg-pista"><div className="h-full rounded-full bg-tinta" style={{ width: `${p ?? 0}%` }} /></div>
+                    <div className="mt-2 h-1 overflow-hidden rounded-full bg-pista"><div className="h-full rounded-full" style={{ width: `${p ?? 0}%`, background: fuerte }} /></div>
                   </div>
                   <div className="w-16 shrink-0 text-right font-mono tabular-nums">
                     <p className="text-[13px]">{rachaActual(h)}<span className="text-sec">/{rachaRecord(h)}d</span></p>

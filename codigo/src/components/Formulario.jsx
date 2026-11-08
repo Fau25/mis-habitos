@@ -15,6 +15,7 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const icono = ICONOS[f.icono] ? f.icono : (CATEGORIAS[f.categoria] ?? CATEGORIAS.otros).icono
   const Icono = ICONOS[icono]
+  const color = CATEGORIAS[f.categoria] ?? CATEGORIAS.otros
 
   useEffect(() => {
     const previo = document.activeElement
@@ -34,7 +35,7 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
         className="sube max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-carta p-5 shadow-xl sm:rounded-3xl">
       <form onSubmit={enviar}>
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-xl bg-pista"><Icono size={20} strokeWidth={1.8} /></span>
+          <span className="grid size-11 place-items-center rounded-xl" style={{ background: color.suave, color: color.fuerte }}><Icono size={20} strokeWidth={1.8} /></span>
           <h2 id="tit-form" className="flex-1 text-lg font-semibold tracking-tight">{nuevo ? 'Nuevo hábito' : 'Editar hábito'}</h2>
           <button type="button" onClick={alCerrar} aria-label="Cerrar" className="grid size-11 place-items-center rounded-full bg-pista"><X size={17} /></button>
         </div>
@@ -50,7 +51,11 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
           <fieldset><legend><Etiqueta>Categoría</Etiqueta></legend>
             <div className="grid grid-cols-3 gap-2">
               {Object.entries(CATEGORIAS).map(([k, c]) => (
-                <button type="button" key={k} onClick={() => set('categoria', k)} aria-pressed={f.categoria === k} className={`!text-xs ${chip(f.categoria === k)}`}>{c.nombre}</button>
+                <button type="button" key={k} onClick={() => set('categoria', k)} aria-pressed={f.categoria === k}
+                  className="flex items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-xs text-tinta"
+                  style={{ background: c.suave, boxShadow: f.categoria === k ? `inset 0 0 0 1.5px ${c.fuerte}` : undefined, fontWeight: f.categoria === k ? 600 : 400 }}>
+                  <span className="size-2 rounded-full" style={{ background: c.fuerte }} />{c.nombre}
+                </button>
               ))}
             </div>
           </fieldset>
@@ -59,7 +64,8 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
             <div className="grid grid-cols-8 gap-1.5">
               {Object.entries(ICONOS).map(([k, I]) => (
                 <button type="button" key={k} onClick={() => set('icono', k)} aria-pressed={icono === k} aria-label={`Icono ${k}`}
-                  className={`grid aspect-square place-items-center rounded-xl ${icono === k ? 'bg-tinta text-white' : 'bg-pista text-sec'}`}><I size={18} strokeWidth={1.8} /></button>
+                  className="grid aspect-square place-items-center rounded-xl"
+                  style={icono === k ? { background: color.suave, color: color.fuerte, boxShadow: `inset 0 0 0 1.5px ${color.fuerte}` } : { background: 'var(--color-pista)', color: 'var(--color-sec)' }}><I size={18} strokeWidth={1.8} /></button>
               ))}
             </div>
           </fieldset>
