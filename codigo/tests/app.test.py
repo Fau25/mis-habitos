@@ -47,9 +47,11 @@ with sync_playwright() as p:
     pg.set_input_files('input[type=file]', '/tmp/_copia.json'); pg.click('button:has-text("Sustituir")')
     ok([h['nombre'] for h in datos(pg)] == ['Importado'], 'importar sustituye tras confirmar')
     open('/tmp/_mal.json', 'w').write('{"hola":1}'); pg.set_input_files('input[type=file]', '/tmp/_mal.json')
-    ok(pg.locator('text=no es una copia').count() == 1, 'importar un archivo inválido avisa y no toca nada')
+    try: pg.wait_for_selector('text=no es una copia', timeout=4000); avisa = True
+    except Exception: avisa = False
+    ok(avisa and [h['nombre'] for h in datos(pg)] == ['Importado'], 'importar un archivo inválido avisa y no toca nada')
     pg2 = b.new_page(); pg2.add_init_script("Object.defineProperty(window,'localStorage',{get(){throw new Error('x')}})")
-    pg2.goto(URL); ok(pg2.locator('text=no deja guardar').count() == 1, 'sin almacenamiento: aviso (F7)'); pg2.close()
+    pg2.goto(URL); pg2.wait_for_selector('h1'); ok(pg2.locator('text=no deja guardar').count() == 1, 'sin almacenamiento: aviso (F7)'); pg2.close()
 
     print('Funciones (F3, F4, F6, F8)')
     poner(pg, [hab('a', 'Agua', creado=K(20), hechos={K(i): 1 for i in range(1, 21)}), hab('b', 'Leer')])
