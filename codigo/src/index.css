@@ -5,15 +5,23 @@
   src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2");
 }
 
+:root { --fondo: #FAF8F3; --carta: #FFFFFF; --tinta: #121211; --sec: #6B6A65; --linea: #ECE9E2; --pista: #EFECE6; --barra: #121211; }
+@media (prefers-color-scheme: dark) {
+  :root { --fondo: #0F0F0E; --carta: #1B1B1A; --tinta: #F3F2EE; --sec: #A4A39D; --linea: #2A2A28; --pista: #232321; --barra: #232321; }
+}
+
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-fondo: var(--fondo); --color-carta: var(--carta); --color-tinta: var(--tinta);
+  --color-sec: var(--sec); --color-linea: var(--linea); --color-pista: var(--pista); --color-barra: var(--barra);
+  --color-rosa: #F2A9D3;
 }
 
 html { -webkit-tap-highlight-color: transparent; }
-body { @apply font-sans text-zinc-900 dark:text-zinc-100 antialiased; }
-input, textarea { font-size: 16px; } /* evita el zoom del iPhone */
+body { @apply bg-fondo font-sans text-tinta antialiased; }
+input, textarea { font-size: 16px; }
 
-@keyframes pop { 0% { transform: scale(1) } 40% { transform: scale(1.25) } 100% { transform: scale(1) } }
+@keyframes pop { 0% { transform: scale(1) } 40% { transform: scale(1.22) } 100% { transform: scale(1) } }
 .pop { animation: pop .32s ease-out; }
 @keyframes sube { from { transform: translateY(100%) } to { transform: none } }
 .sube { animation: sube .22s cubic-bezier(.2,.8,.2,1); }

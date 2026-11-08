@@ -12,9 +12,9 @@ const leer = () => {
 const ejemplos = () => {
   const c = clave(hoy())
   return [
-    { id: 'e1', nombre: 'Beber 2 litros de agua', desc: 'Una botella por la mañana y otra por la tarde', categoria: 'salud', frecuencia: 'diario', dias: [], momento: 'manana', creado: c, hechos: {} },
-    { id: 'e2', nombre: 'Leer 20 minutos', desc: '', categoria: 'aprendizaje', frecuencia: 'diario', dias: [], momento: 'noche', creado: c, hechos: {} },
-    { id: 'e3', nombre: 'Revisar gastos', desc: 'Apuntar lo gastado en el día', categoria: 'finanzas', frecuencia: 'dias', dias: [1, 3, 5], momento: 'tarde', creado: c, hechos: {} },
+    { id: 'e1', nombre: 'Beber 2 litros de agua', desc: 'Una botella por la mañana y otra por la tarde', emoji: '💧', categoria: 'salud', frecuencia: 'diario', dias: [], momento: 'manana', creado: c, hechos: {} },
+    { id: 'e2', nombre: 'Leer 20 minutos', desc: '', emoji: '📚', categoria: 'aprendizaje', frecuencia: 'diario', dias: [], momento: 'noche', creado: c, hechos: {} },
+    { id: 'e3', nombre: 'Revisar gastos', desc: 'Apuntar lo gastado en el día', emoji: '💰', categoria: 'finanzas', frecuencia: 'dias', dias: [1, 3, 5], momento: 'tarde', creado: c, hechos: {} },
   ]
 }
 

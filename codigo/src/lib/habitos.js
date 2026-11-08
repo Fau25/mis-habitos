@@ -1,14 +1,26 @@
-import { clave, desdeClave, sumarDias, hoy } from './fechas'
-import { HeartPulse, Briefcase, Flower2, PiggyBank, BookOpen, Sparkles, Sunrise, Sun, Moon } from 'lucide-react'
+import { clave, desdeClave, sumarDias, hoy, DIAS } from './fechas'
+import { Sunrise, Sun, Moon } from 'lucide-react'
 
-// Clases completas para que Tailwind las incluya
+// Colores pastel de la referencia; el tono suave es el mismo con transparencia (sirve en claro y oscuro)
 export const CATEGORIAS = {
-  salud:         { nombre: 'Salud',         Icono: HeartPulse, punto: 'bg-emerald-500', suave: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300', borde: 'border-emerald-500', relleno: 'bg-emerald-500' },
-  productividad: { nombre: 'Productividad', Icono: Briefcase,  punto: 'bg-blue-500',    suave: 'bg-blue-500/12 text-blue-700 dark:text-blue-300',          borde: 'border-blue-500',    relleno: 'bg-blue-500' },
-  bienestar:     { nombre: 'Bienestar',     Icono: Flower2,    punto: 'bg-violet-500',  suave: 'bg-violet-500/12 text-violet-700 dark:text-violet-300',    borde: 'border-violet-500',  relleno: 'bg-violet-500' },
-  finanzas:      { nombre: 'Finanzas',      Icono: PiggyBank,  punto: 'bg-amber-500',   suave: 'bg-amber-500/15 text-amber-800 dark:text-amber-300',       borde: 'border-amber-500',   relleno: 'bg-amber-500' },
-  aprendizaje:   { nombre: 'Aprendizaje',   Icono: BookOpen,   punto: 'bg-sky-500',     suave: 'bg-sky-500/12 text-sky-700 dark:text-sky-300',             borde: 'border-sky-500',     relleno: 'bg-sky-500' },
-  otros:         { nombre: 'Otros',         Icono: Sparkles,   punto: 'bg-zinc-500',    suave: 'bg-zinc-500/12 text-zinc-700 dark:text-zinc-300',          borde: 'border-zinc-500',    relleno: 'bg-zinc-500' },
+  salud:         { nombre: 'Salud',         color: '#F2A9D3', emoji: '💧' },
+  productividad: { nombre: 'Productividad', color: '#B5C7F2', emoji: '💻' },
+  bienestar:     { nombre: 'Bienestar',     color: '#CFC8F6', emoji: '🧘' },
+  finanzas:      { nombre: 'Finanzas',      color: '#F5D769', emoji: '💰' },
+  aprendizaje:   { nombre: 'Aprendizaje',   color: '#C8DB8B', emoji: '📚' },
+  otros:         { nombre: 'Otros',         color: '#E3D3BE', emoji: '✨' },
+}
+export const EMOJIS = ['💧','🧘','💊','😴','💻','🥑','🏃','📚','💰','🍎','🦷','🚶','🏋️','✍️','🎸','🧹','📵','🌱','☕','🐶','🧴','🙏','🎯','❤️']
+
+export const cat = (h) => CATEGORIAS[h.categoria] ?? CATEGORIAS.otros
+export const colorDe = (h) => cat(h).color
+export const suave = (c, a = '47') => c + a
+export const emojiDe = (h) => h.emoji || cat(h).emoji
+
+export const frecuenciaTexto = (h) => {
+  if (h.frecuencia === 'diario' || h.dias.length === 7) return 'Cada día'
+  if (h.dias.length <= 3) return DIAS.filter((d) => h.dias.includes(d.n)).map((d) => d.largo.slice(0, 3)).join(' · ')
+  return `${h.dias.length} días por semana`
 }
 
 export const MOMENTOS = {
@@ -47,8 +59,35 @@ export function rachaRecord(h) {
   return max
 }
 
-// Resumen de un día: cuántos tocaban y cuántos se hicieron
 export function resumenDia(habitos, fecha) {
   const toca = habitos.filter((h) => tocaEl(h, fecha))
   return { total: toca.length, hechos: toca.filter((h) => hecho(h, fecha)).length }
+}
+
+// Puntuación 0–10 del día
+export const puntuacion = (habitos, fecha) => {
+  const { total, hechos } = resumenDia(habitos, fecha)
+  return total ? (hechos / total) * 10 : null
+}
+
+// Rachas generales: días seguidos con todo hecho (los días sin nada que hacer no cuentan ni rompen)
+export function rachasGenerales(habitos) {
+  if (!habitos.length) return { actual: 0, record: 0 }
+  const inicio = habitos.reduce((m, h) => (h.creado < m ? h.creado : m), clave(hoy()))
+  const fin = clave(hoy())
+  let d = desdeClave(inicio), run = 0, record = 0
+  for (let i = 0; i < 3660 && clave(d) <= fin; i++, d = sumarDias(d, 1)) {
+    const { total, hechos } = resumenDia(habitos, d)
+    if (!total) continue
+    if (hechos === total) record = Math.max(record, ++run)
+    else if (clave(d) !== fin) run = 0
+  }
+  return { actual: run, record }
+}
+
+// Porcentaje de días cumplidos de un hábito en los últimos n días (null si no tocaba ninguno)
+export function porcentaje(h, n = 30) {
+  let t = 0, c = 0
+  for (let i = 0; i < n; i++) { const d = sumarDias(hoy(), -i); if (tocaEl(h, d)) { t++; if (hecho(h, d)) c++ } }
+  return t ? Math.round((c / t) * 100) : null
 }
