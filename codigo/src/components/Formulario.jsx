@@ -86,7 +86,7 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
           </fieldset>
 
           <fieldset><legend><Etiqueta>Momento del día</Etiqueta></legend>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {Object.entries(MOMENTOS).map(([k, m]) => (
                 <button type="button" key={k} className={`flex items-center justify-center gap-1.5 ${chip(f.momento === k)}`} aria-pressed={f.momento === k} onClick={() => set('momento', k)}>
                   <m.Icono size={15} />{m.nombre}

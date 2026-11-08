@@ -30,6 +30,8 @@ with sync_playwright() as p:
     ok(pg.locator('text=Beber 2 litros de agua').count() == 1, 'primera vez: hábitos de ejemplo')
     pg.click('[aria-label="Nuevo hábito"]'); pg.fill('input >> nth=0', 'Meditar'); pg.fill('input >> nth=1', 'Diez minutos'); pg.click('button:has-text("Crear hábito")')
     ok(pg.locator('text=Diez minutos').count() == 1, 'crear hábito y la descripción se ve (F5)')
+    pg.click('[aria-label="Nuevo hábito"]'); pg.fill('input >> nth=0', 'Estirar'); pg.click('button:has-text("Todo el día")'); pg.click('button:has-text("Crear hábito")')
+    ok(any(h['nombre'] == 'Estirar' and h['momento'] == 'todo' for h in datos(pg)) and pg.locator('text=todo el día').count() >= 1, 'momento «Todo el día»')
     pg.click('[aria-label="Marcar Meditar"]'); ok(any(h['nombre'] == 'Meditar' and h['hechos'] for h in datos(pg)), 'marcar guarda')
     pg.reload(); ok(pg.locator('[aria-label="Desmarcar Meditar"]').count() == 1, 'persiste al recargar')
 

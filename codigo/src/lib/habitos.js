@@ -1,5 +1,5 @@
 import { clave, desdeClave, sumarDias, hoy, DIAS } from './fechas'
-import { Sunrise, Sun, Moon, Droplet, Leaf, Pill, BedDouble, Laptop, Apple, Footprints, BookOpen, PiggyBank,
+import { Clock, Sunrise, Sun, Moon, Droplet, Leaf, Pill, BedDouble, Laptop, Apple, Footprints, BookOpen, PiggyBank,
   Dumbbell, PenLine, Music, Brush, PhoneOff, Sprout, Coffee, Dog, HeartPulse, Briefcase, Sparkles, Target, Bike } from 'lucide-react'
 
 export const ICONOS = { gota: Droplet, hoja: Leaf, pastilla: Pill, cama: BedDouble, portatil: Laptop, manzana: Apple,
@@ -28,11 +28,12 @@ export const frecuenciaTexto = (h) => {
 }
 
 export const MOMENTOS = {
+  todo:   { nombre: 'Todo el día', corto: 'todo el día', Icono: Clock },
   manana: { nombre: 'Mañana', corto: 'mañana', Icono: Sunrise },
   tarde:  { nombre: 'Tarde',  corto: 'tarde',  Icono: Sun },
   noche:  { nombre: 'Noche',  corto: 'noche',  Icono: Moon },
 }
-export const ORDEN_MOMENTO = { manana: 0, tarde: 1, noche: 2 }
+export const ORDEN_MOMENTO = { todo: 0, manana: 1, tarde: 2, noche: 3 }
 
 // Frecuencia que tenía el hábito ese día: `historial` guarda las anteriores con su último día (`hasta`)
 export const configEl = (h, k) => (h.historial ?? []).find((c) => k <= c.hasta) ?? h
