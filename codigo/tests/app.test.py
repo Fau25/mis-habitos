@@ -68,6 +68,11 @@ with sync_playwright() as p:
     h = datos(pg)[0]; ok(h.get('historial') and h['historial'][0]['frecuencia'] == 'diario' and h['historial'][0]['hasta'] == K(1), 'cambiar frecuencia guarda la anterior (F6)')
     pg.click('[aria-label="Estadísticas"]'); ok(pg.locator('text=/\\/1[0-9]d/').count() >= 1, 'el pasado conserva su récord tras cambiar la frecuencia')
 
+    poner(pg, [hab('a', 'Agua', hechos={K(1): 1}), hab('f', 'Gastos', categoria='finanzas', hechos={K(1): 1})])
+    pg.click('[aria-label="Estadísticas"]'); pg.click('button:has-text("Finanzas")')
+    ok(pg.locator('main li').count() == 1 and pg.locator('text=Gastos').count() == 1, 'filtrar estadísticas por categoría')
+    ok('rgb(151, 112, 15)' in pg.evaluate("[...document.querySelectorAll('main span')].map(e=>getComputedStyle(e).backgroundColor).join()"), 'el mapa y su leyenda usan los colores de la categoría')
+
     print('Accesibilidad (U2, U3, U4)')
     pg.click('[aria-label="Hoy"]'); pg.focus('[aria-label="Nuevo hábito"]'); pg.keyboard.press('Enter')
     ok(pg.evaluate("document.querySelector('main').inert === true"), 'fondo inerte con la hoja abierta')
