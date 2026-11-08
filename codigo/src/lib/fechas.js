@@ -16,3 +16,4 @@ export const DIAS = [
 
 export const fechaLarga = (d) =>
   new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(d)
+export const lunesDe = (d) => sumarDias(d, -((new Date(d).getDay() + 6) % 7))

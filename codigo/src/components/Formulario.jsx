@@ -17,10 +17,11 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
   const Icono = ICONOS[icono]
 
   useEffect(() => {
-    if (nuevo) ref.current?.querySelector('input')?.focus({ preventScroll: true })
+    const previo = document.activeElement
+    ;(nuevo ? ref.current?.querySelector('input') : ref.current)?.focus({ preventScroll: true })
     const esc = (e) => e.key === 'Escape' && alCerrar()
     addEventListener('keydown', esc)
-    return () => removeEventListener('keydown', esc)
+    return () => { removeEventListener('keydown', esc); previo?.focus?.({ preventScroll: true }) }
   }, [alCerrar, nuevo])
 
   const valido = f.nombre.trim() && (f.frecuencia === 'diario' || f.dias.length)
@@ -29,12 +30,13 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 sm:items-center" onClick={alCerrar}>
-      <form ref={ref} onSubmit={enviar} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="tit-form"
+      <div ref={ref} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabIndex={-1} aria-labelledby="tit-form"
         className="sube max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-carta p-5 shadow-xl sm:rounded-3xl">
+      <form onSubmit={enviar}>
         <div className="mb-4 flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-xl bg-pista"><Icono size={20} strokeWidth={1.8} /></span>
           <h2 id="tit-form" className="flex-1 text-lg font-semibold tracking-tight">{nuevo ? 'Nuevo hábito' : 'Editar hábito'}</h2>
-          <button type="button" onClick={alCerrar} aria-label="Cerrar" className="grid size-9 place-items-center rounded-full bg-pista"><X size={17} /></button>
+          <button type="button" onClick={alCerrar} aria-label="Cerrar" className="grid size-11 place-items-center rounded-full bg-pista"><X size={17} /></button>
         </div>
 
         <div className="space-y-4">
@@ -100,6 +102,7 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
           </button>
         </div>
       </form>
+      </div>
     </div>
   )
 }

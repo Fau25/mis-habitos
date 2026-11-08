@@ -1,0 +1,19 @@
+# Compila y pasa las pruebas en cada cambio de codigo/. Si fallan, avisa (la web no se toca).
+name: Pruebas
+on:
+  push:
+    paths: ['codigo/**']
+  workflow_dispatch:
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: codigo } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: codigo/package-lock.json }
+      - run: npm ci
+      - run: npx oxlint src
+      - run: npm run build
+      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - run: python tests/app.test.py

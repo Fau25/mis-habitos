@@ -33,15 +33,19 @@ export const MOMENTOS = {
 }
 export const ORDEN_MOMENTO = { manana: 0, tarde: 1, noche: 2 }
 
+// Frecuencia que tenía el hábito ese día: `historial` guarda las anteriores con su último día (`hasta`)
+export const configEl = (h, k) => (h.historial ?? []).find((c) => k <= c.hasta) ?? h
 export const tocaEl = (h, fecha) => {
-  if (clave(fecha) < h.creado) return false
-  return h.frecuencia === 'diario' || h.dias.includes(new Date(fecha).getDay())
+  const k = clave(fecha)
+  if (k < h.creado) return false
+  const c = configEl(h, k)
+  return c.frecuencia === 'diario' || c.dias.includes(new Date(fecha).getDay())
 }
 export const hecho = (h, fecha) => !!h.hechos[clave(fecha)]
 
-// Días seguidos cumplidos (solo cuentan los días en que toca). Hoy sin hacer no rompe la racha.
-export function rachaActual(h) {
-  let d = hoy(), n = 0
+// Días seguidos cumplidos hasta `ref` (solo cuentan los días en que toca). `ref` sin hacer no rompe la racha.
+export function rachaActual(h, ref = hoy()) {
+  let d = ref, n = 0
   if (tocaEl(h, d) && !hecho(h, d)) d = sumarDias(d, -1)
   for (let i = 0; i < 3660 && clave(d) >= h.creado; i++, d = sumarDias(d, -1)) {
     if (!tocaEl(h, d)) continue
@@ -77,6 +81,12 @@ export function rachasGenerales(habitos) {
     else if (clave(d) !== fin) run = 0
   }
   return { actual: run, record }
+}
+// % de todos los días-hábito que tocaban en los últimos n días
+export function porcentajeGlobal(habitos, n = 30) {
+  let t = 0, c = 0
+  for (let i = 0; i < n; i++) { const r = resumenDia(habitos, sumarDias(hoy(), -i)); t += r.total; c += r.hechos }
+  return t ? Math.round((c / t) * 100) : null
 }
 export function porcentaje(h, n = 30) {
   let t = 0, c = 0
