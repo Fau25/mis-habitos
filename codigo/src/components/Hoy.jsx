@@ -1,66 +1,85 @@
 import { useState } from 'react'
-import { ChevronDown, Plus, TrendingDown, TrendingUp } from 'lucide-react'
-import { MOMENTOS, tocaEl, hecho, rachaActual, puntuacion } from '../lib/habitos'
-import { fechaLarga, sumarDias } from '../lib/fechas'
-import Anillo from './Anillo'
+import { ChevronDown } from 'lucide-react'
+import { ORDEN_MOMENTO, tocaEl, hecho, rachaActual, resumenDia } from '../lib/habitos'
+import { DIAS, clave, sumarDias, hoy } from '../lib/fechas'
 import Habito from './Habito'
 
-const coma = (x) => x.toFixed(1).replace('.', ',')
+const fmt = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })
 
-export default function Hoy({ habitos, dia, alAlternar, alEditar, alCrear }) {
+function Aro({ p }) {
+  const r = 12, L = 2 * Math.PI * r
+  return (
+    <svg width="30" height="30" viewBox="0 0 30 30" className="-rotate-90" aria-hidden="true">
+      <circle cx="15" cy="15" r={r} fill="none" strokeWidth="3" className="stroke-pista" />
+      {p > 0 && <circle cx="15" cy="15" r={r} fill="none" strokeWidth="3" strokeLinecap="round" className="stroke-tinta transition-[stroke-dashoffset] duration-300"
+        strokeDasharray={L} strokeDashoffset={L * (1 - p)} />}
+    </svg>
+  )
+}
+
+export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
   const [verOtros, setVerOtros] = useState(false)
-  const deHoy = habitos.filter((h) => tocaEl(h, dia))
+  const hoyK = clave(hoy()), esHoy = clave(dia) === hoyK
+  const lunes = sumarDias(hoy(), -((hoy().getDay() + 6) % 7))
+  const semana = DIAS.map((_, i) => sumarDias(lunes, i))
+  const deDia = habitos.filter((h) => tocaEl(h, dia))
+    .sort((a, b) => hecho(a, dia) - hecho(b, dia) || ORDEN_MOMENTO[a.momento] - ORDEN_MOMENTO[b.momento])
   const otros = habitos.filter((h) => !tocaEl(h, dia))
-  const nHechos = deHoy.filter((h) => hecho(h, dia)).length
-  const nota = puntuacion(habitos, dia)
-  const ayer = puntuacion(habitos, sumarDias(dia, -1))
-  const cambio = nota !== null && ayer ? Math.round(((nota - ayer) / ayer) * 100) : null
-  const completo = deHoy.length > 0 && nHechos === deHoy.length
+  const { total, hechos } = resumenDia(habitos, dia)
+  const pct = total ? Math.round((hechos / total) * 100) : 0
 
   return (
     <>
-      <p className="-mt-2 mb-2 text-center text-sm text-sec first-letter:uppercase">{fechaLarga(dia)}</p>
-      <Anillo habitos={deHoy} dia={dia}>
-        <div className="text-center">
-          <p className="text-6xl font-semibold tracking-tighter tabular-nums">{nota === null ? '–' : coma(nota)}</p>
-          <p className="mx-auto mt-1 max-w-[150px] text-xs leading-snug text-sec">
-            {deHoy.length === 0 ? 'Hoy no tienes hábitos' : completo ? <>¡Todos tus <b className="text-tinta">hábitos de hoy</b> están hechos!</> : <>Tus <b className="text-tinta">hábitos de hoy</b> no están completos · {nHechos}/{deHoy.length}</>}
-          </p>
+      <header className="flex items-end justify-between px-1">
+        <div>
+          <p className="text-[13px] text-sec first-letter:uppercase">{fmt.format(dia)}</p>
+          <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight">{esHoy ? 'Hoy' : 'Corrigiendo'}</h1>
         </div>
-      </Anillo>
+        <p className="pb-1 font-mono text-[13px] text-sec">{hechos}/{total} · <span className="text-tinta">{pct}%</span></p>
+      </header>
 
-      <div className="mt-2 flex justify-center">
-        <button onClick={alCrear} className="flex items-center gap-1.5 rounded-full bg-tinta px-5 py-2.5 text-sm font-medium text-fondo">
-          <Plus size={16} /> Añadir hábito
-        </button>
+      <div className="mt-4 grid grid-cols-7 gap-0.5" role="group" aria-label="Días de esta semana">
+        {semana.map((d, i) => {
+          const k = clave(d), futuro = k > hoyK, sel = k === clave(dia)
+          const r = resumenDia(habitos, d)
+          return (
+            <button key={k} disabled={futuro} onClick={() => setDia(d)} aria-pressed={sel}
+              aria-label={`${DIAS[i].largo} ${d.getDate()}: ${r.hechos} de ${r.total}`}
+              className={`flex flex-col items-center gap-1.5 rounded-xl py-2 disabled:opacity-35 ${sel ? 'bg-carta shadow-[0_0_0_1px_var(--color-linea)]' : ''}`}>
+              <span className={`text-[11px] ${sel ? 'font-semibold' : 'text-sec'}`}>{DIAS[i].corto}</span>
+              <Aro p={futuro || !r.total ? 0 : r.hechos / r.total} />
+              <span className={`font-mono text-[11px] ${k === hoyK ? 'font-medium text-tinta' : 'text-sec'}`}>{d.getDate()}</span>
+            </button>
+          )
+        })}
       </div>
 
-      {cambio !== null && cambio !== 0 && (
-        <div className={`mt-5 flex items-center gap-3 rounded-2xl p-4 text-sm font-medium ${cambio < 0 ? 'bg-[#F2A9D3]/30' : 'bg-[#C8DB8B]/35'}`}>
-          {cambio < 0 ? <TrendingDown size={20} className="shrink-0 text-red-500" /> : <TrendingUp size={20} className="shrink-0 text-emerald-600" />}
-          <p>Tu puntuación ha {cambio < 0 ? 'bajado' : 'subido'} <span className={cambio < 0 ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-400'}>{Math.abs(cambio)} %</span> respecto a ayer.</p>
-        </div>
+      <div className="mx-1 mt-4 h-1 overflow-hidden rounded-full bg-pista">
+        <div className="h-full rounded-full bg-tinta transition-[width] duration-500" style={{ width: `${pct}%` }} />
+      </div>
+
+      {!esHoy && (
+        <button onClick={() => setDia(hoy())} className="mt-3 w-full rounded-xl bg-carta py-2.5 text-sm font-medium shadow-[0_0_0_1px_var(--color-linea)]">Volver a hoy</button>
       )}
 
-      {Object.entries(MOMENTOS).map(([k, m]) => {
-        const lista = deHoy.filter((h) => h.momento === k).sort((a, b) => hecho(a, dia) - hecho(b, dia))
-        if (!lista.length) return null
-        return (
-          <section key={k} className="mt-6">
-            <h2 className="mb-2 flex items-center gap-1.5 px-1 text-sm font-semibold"><m.Icono size={15} className="text-sec" /> {m.nombre}</h2>
-            <ul className="space-y-2">
-              {lista.map((h) => <Habito key={h.id} h={h} hecho={hecho(h, dia)} racha={rachaActual(h)} alAlternar={() => alAlternar(h.id)} alEditar={() => alEditar(h)} />)}
-            </ul>
-          </section>
-        )
-      })}
+      {habitos.length === 0 ? (
+        <p className="mt-10 text-center text-sec">Aún no tienes hábitos. Pulsa <b className="text-tinta">+</b> para crear el primero.</p>
+      ) : deDia.length > 0 ? (
+        <ul className="mt-4 overflow-hidden rounded-2xl border border-linea bg-carta">
+          {deDia.map((h) => <Habito key={h.id} h={h} dia={dia} racha={rachaActual(h)} alAlternar={() => alAlternar(h.id)} alEditar={() => alEditar(h)} />)}
+        </ul>
+      ) : <p className="mt-6 text-center text-sm text-sec">Este día no tocaba ningún hábito.</p>}
 
       {otros.length > 0 && (
-        <section className="mt-6">
-          <button onClick={() => setVerOtros(!verOtros)} aria-expanded={verOtros} className="flex items-center gap-1 px-1 text-sm font-semibold text-sec">
-            Hoy no toca ({otros.length}) <ChevronDown size={15} className={`transition-transform ${verOtros ? 'rotate-180' : ''}`} />
+        <section className="mt-5">
+          <button onClick={() => setVerOtros(!verOtros)} aria-expanded={verOtros} className="flex items-center gap-1 px-1 text-[13px] text-sec">
+            No toca este día ({otros.length}) <ChevronDown size={14} className={`transition-transform ${verOtros ? 'rotate-180' : ''}`} />
           </button>
-          {verOtros && <ul className="mt-2 space-y-2">{otros.map((h) => <Habito key={h.id} h={h} apagado racha={rachaActual(h)} alEditar={() => alEditar(h)} />)}</ul>}
+          {verOtros && (
+            <ul className="mt-2 overflow-hidden rounded-2xl border border-linea bg-carta">
+              {otros.map((h) => <Habito key={h.id} h={h} dia={dia} apagado racha={rachaActual(h)} alEditar={() => alEditar(h)} />)}
+            </ul>
+          )}
         </section>
       )}
     </>

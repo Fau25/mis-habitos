@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { X, Trash2 } from 'lucide-react'
-import { CATEGORIAS, MOMENTOS, EMOJIS, suave } from '../lib/habitos'
+import { CATEGORIAS, MOMENTOS, ICONOS } from '../lib/habitos'
 import { DIAS } from '../lib/fechas'
 
-const Etiqueta = ({ children }) => <span className="mb-1.5 block text-xs font-semibold text-sec">{children}</span>
+const Etiqueta = ({ children }) => <span className="mb-1.5 block text-xs font-medium text-sec">{children}</span>
 const campo = 'w-full rounded-xl border border-linea bg-fondo px-3.5 py-3 outline-none focus:border-tinta'
-const chip = (on) => `rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${on ? 'bg-tinta text-fondo' : 'bg-pista text-sec'}`
+const chip = (on) => `rounded-xl px-3 py-2.5 text-sm transition-colors ${on ? 'bg-tinta text-white' : 'bg-pista text-sec'}`
 
 export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
   const nuevo = !inicial?.id
@@ -13,8 +13,8 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
   const [confirmar, setConfirmar] = useState(false)
   const ref = useRef(null)
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
-  const color = (CATEGORIAS[f.categoria] ?? CATEGORIAS.otros).color
-  const emoji = f.emoji || (CATEGORIAS[f.categoria] ?? CATEGORIAS.otros).emoji
+  const icono = ICONOS[f.icono] ? f.icono : (CATEGORIAS[f.categoria] ?? CATEGORIAS.otros).icono
+  const Icono = ICONOS[icono]
 
   useEffect(() => {
     if (nuevo) ref.current?.querySelector('input')?.focus({ preventScroll: true })
@@ -24,16 +24,16 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
   }, [alCerrar, nuevo])
 
   const valido = f.nombre.trim() && (f.frecuencia === 'diario' || f.dias.length)
-  const enviar = (e) => { e.preventDefault(); if (valido) alGuardar({ ...f, emoji, nombre: f.nombre.trim(), desc: f.desc.trim() }) }
+  const enviar = (e) => { e.preventDefault(); if (valido) alGuardar({ ...f, icono, nombre: f.nombre.trim(), desc: f.desc.trim() }) }
   const alternarDia = (n) => set('dias', f.dias.includes(n) ? f.dias.filter((d) => d !== n) : [...f.dias, n])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center" onClick={alCerrar}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 sm:items-center" onClick={alCerrar}>
       <form ref={ref} onSubmit={enviar} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="tit-form"
         className="sube max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-carta p-5 shadow-xl sm:rounded-3xl">
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-full text-2xl" style={{ background: suave(color) }}>{emoji}</span>
-          <h2 id="tit-form" className="flex-1 text-lg font-semibold">{nuevo ? 'Nuevo hábito' : 'Editar hábito'}</h2>
+          <span className="grid size-11 place-items-center rounded-xl bg-pista"><Icono size={20} strokeWidth={1.8} /></span>
+          <h2 id="tit-form" className="flex-1 text-lg font-semibold tracking-tight">{nuevo ? 'Nuevo hábito' : 'Editar hábito'}</h2>
           <button type="button" onClick={alCerrar} aria-label="Cerrar" className="grid size-9 place-items-center rounded-full bg-pista"><X size={17} /></button>
         </div>
 
@@ -48,20 +48,16 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
           <fieldset><legend><Etiqueta>Categoría</Etiqueta></legend>
             <div className="grid grid-cols-3 gap-2">
               {Object.entries(CATEGORIAS).map(([k, c]) => (
-                <button type="button" key={k} onClick={() => set('categoria', k)} aria-pressed={f.categoria === k}
-                  className="flex items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-xs font-medium transition-shadow"
-                  style={{ background: suave(c.color, f.categoria === k ? 'FF' : '40'), color: f.categoria === k ? '#121211' : undefined, boxShadow: f.categoria === k ? 'inset 0 0 0 2px #12121133' : undefined }}>
-                  {c.nombre}
-                </button>
+                <button type="button" key={k} onClick={() => set('categoria', k)} aria-pressed={f.categoria === k} className={`!text-xs ${chip(f.categoria === k)}`}>{c.nombre}</button>
               ))}
             </div>
           </fieldset>
 
           <fieldset><legend><Etiqueta>Icono</Etiqueta></legend>
             <div className="grid grid-cols-8 gap-1.5">
-              {EMOJIS.map((e) => (
-                <button type="button" key={e} onClick={() => set('emoji', e)} aria-pressed={emoji === e} aria-label={`Icono ${e}`}
-                  className="grid aspect-square place-items-center rounded-xl text-xl" style={{ background: emoji === e ? suave(color, 'AA') : 'var(--pista)' }}>{e}</button>
+              {Object.entries(ICONOS).map(([k, I]) => (
+                <button type="button" key={k} onClick={() => set('icono', k)} aria-pressed={icono === k} aria-label={`Icono ${k}`}
+                  className={`grid aspect-square place-items-center rounded-xl ${icono === k ? 'bg-tinta text-white' : 'bg-pista text-sec'}`}><I size={18} strokeWidth={1.8} /></button>
               ))}
             </div>
           </fieldset>
@@ -75,7 +71,7 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
               <div className="mt-2 grid grid-cols-7 gap-1.5">
                 {DIAS.map((d) => (
                   <button type="button" key={d.n} onClick={() => alternarDia(d.n)} aria-pressed={f.dias.includes(d.n)} aria-label={d.largo}
-                    className={`aspect-square !rounded-full !px-0 ${chip(f.dias.includes(d.n))}`}>{d.corto}</button>
+                    className={`aspect-square !px-0 font-mono ${chip(f.dias.includes(d.n))}`}>{d.corto}</button>
                 ))}
               </div>
             )}
@@ -95,11 +91,11 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
         <div className="mt-6 flex gap-2">
           {!nuevo && (
             <button type="button" onClick={() => (confirmar ? alBorrar(f.id) : setConfirmar(true))}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-medium ${confirmar ? 'bg-red-600 text-white' : 'text-red-600 dark:text-red-400'}`}>
+              className={`flex items-center gap-1.5 rounded-xl px-4 py-3 text-sm font-medium ${confirmar ? 'bg-red-600 text-white' : 'text-red-600'}`}>
               <Trash2 size={16} />{confirmar ? '¿Seguro?' : 'Eliminar'}
             </button>
           )}
-          <button type="submit" disabled={!valido} className="flex-1 rounded-full bg-tinta px-4 py-3 font-semibold text-fondo disabled:opacity-35">
+          <button type="submit" disabled={!valido} className="flex-1 rounded-xl bg-tinta px-4 py-3 font-medium text-white disabled:opacity-35">
             {nuevo ? 'Crear hábito' : 'Guardar'}
           </button>
         </div>
