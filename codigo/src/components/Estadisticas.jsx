@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { CATEGORIAS, cat, porcentaje, porcentajeGlobal, rachaActual, rachaRecord, rachasGenerales, resumenDia } from '../lib/habitos'
+import { CATEGORIAS, cat, mezcla, porcentaje, porcentajeGlobal, rachaActual, rachaRecord, rachasGenerales, resumenDia } from '../lib/habitos'
 import { IconoHabito } from './Habito'
 import { DIAS, clave, sumarDias, hoy, lunesDe } from '../lib/fechas'
 
 const SEMANAS = 20
 const NIVELES = ['#EEEEEC', '#BDBDC4', '#8E8E96', '#52525B', '#18181B']
 // Escala de una categoría: vacío → pastel → … → tono fuerte de la categoría
-const mezcla = (a, b, t) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t) + parseInt(b.slice(i, i + 2), 16) * t).toString(16).padStart(2, '0')).join('')
 const escala = (c) => ['#EEEEEC', mezcla(c.suave, c.fuerte, 0.12), mezcla(c.suave, c.fuerte, 0.4), mezcla(c.suave, c.fuerte, 0.7), c.fuerte]
 const nivel = (p) => (p === 1 ? 4 : p >= 0.66 ? 3 : p >= 0.33 ? 2 : 1)
 const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short' })

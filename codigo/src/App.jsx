@@ -56,7 +56,7 @@ export default function App() {
   const abierto = !!editando
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-4 pt-6 pb-32">
+    <div className="mx-auto min-h-dvh max-w-lg px-3 pt-5 pb-32">
       <main inert={abierto || undefined}>
         {AVISOS[estado] && (
           <p role="alert" className="mb-4 flex gap-2.5 rounded-2xl border border-tinta bg-carta p-3.5 text-sm">

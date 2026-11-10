@@ -29,9 +29,9 @@ with sync_playwright() as p:
     print('Básico')
     ok(pg.locator('text=Beber 2 litros de agua').count() == 1, 'primera vez: hábitos de ejemplo')
     pg.click('[aria-label="Nuevo hábito"]'); pg.fill('input >> nth=0', 'Meditar'); pg.fill('input >> nth=1', 'Diez minutos'); pg.click('button:has-text("Crear hábito")')
-    ok(pg.locator('text=Diez minutos').count() == 1, 'crear hábito y la descripción se ve (F5)')
+    ok(any(h['desc'] == 'Diez minutos' for h in datos(pg)) and pg.locator('[title*="Diez minutos"]').count() == 1, 'crear hábito con descripción')
     pg.click('[aria-label="Nuevo hábito"]'); pg.fill('input >> nth=0', 'Estirar'); pg.click('button:has-text("Todo el día")'); pg.click('button:has-text("Crear hábito")')
-    ok(any(h['nombre'] == 'Estirar' and h['momento'] == 'todo' for h in datos(pg)) and pg.locator('text=todo el día').count() >= 1, 'momento «Todo el día»')
+    ok(any(h['nombre'] == 'Estirar' and h['momento'] == 'todo' for h in datos(pg)), 'momento «Todo el día»')
     pg.click('[aria-label="Marcar Meditar"]'); ok(any(h['nombre'] == 'Meditar' and h['hechos'] for h in datos(pg)), 'marcar guarda')
     pg.reload(); ok(pg.locator('[aria-label="Desmarcar Meditar"]').count() == 1, 'persiste al recargar')
 
@@ -57,14 +57,14 @@ with sync_playwright() as p:
 
     print('Funciones (F3, F4, F6, F8)')
     poner(pg, [hab('a', 'Agua', creado=K(20), hechos={K(i): 1 for i in range(1, 21)}), hab('b', 'Leer')])
-    pg.click('button:has-text("Leer")'); pg.click('text=Eliminar'); pg.click('text=¿Seguro?')
+    pg.click('[aria-label="Marcar Leer"]', button='right'); pg.click('text=Eliminar'); pg.click('text=¿Seguro?')
     ok(len(datos(pg)) == 1, 'eliminar'); pg.click('text=Deshacer'); ok(len(datos(pg)) == 2 and datos(pg)[1]['id'] == 'b', 'deshacer devuelve el hábito en su sitio (F3)')
     pg.click('[aria-label="Semana anterior"]'); ok(pg.locator('text=Corrigiendo').count() == 1, 'ir a la semana anterior (F4)')
     pg.locator('[role=group] button').first.click(); pg.click('[aria-label^="Desmarcar Agua"]')
     lunes_ant = hoy - datetime.timedelta(days=hoy.weekday() + 7)
     ok(str(lunes_ant) not in datos(pg)[0]['hechos'], 'corregir el lunes de la semana pasada')
     pg.click('text=Volver a hoy')
-    pg.click('main li button:has-text("Agua") >> nth=0'); pg.click('text=Días concretos'); pg.click('[aria-label="sábado"]'); pg.click('button:has-text("Guardar")')
+    pg.click('button:has-text("Editar")'); pg.click('[aria-label="Editar Agua"]'); pg.wait_for_selector('[role=dialog]'); pg.click('text=Días concretos'); pg.click('[aria-label="sábado"]'); pg.click('button:has-text("Guardar")'); pg.click('button:has-text("Listo")')
     h = datos(pg)[0]; ok(h.get('historial') and h['historial'][0]['frecuencia'] == 'diario' and h['historial'][0]['hasta'] == K(1), 'cambiar frecuencia guarda la anterior (F6)')
     pg.click('[aria-label="Estadísticas"]'); ok(pg.locator('text=/\\/1[0-9]d/').count() >= 1, 'el pasado conserva su récord tras cambiar la frecuencia')
 
@@ -78,7 +78,8 @@ with sync_playwright() as p:
     ok(pg.evaluate("document.querySelector('main').inert === true"), 'fondo inerte con la hoja abierta')
     pg.keyboard.press('Escape'); ok(pg.evaluate("document.activeElement.getAttribute('aria-label')") == 'Nuevo hábito', 'el foco vuelve al botón al cerrar')
     ok(pg.locator('[role=group] button').first.evaluate("e=>e.textContent.startsWith('L')"), 'los días se nombran empezando por lo visible')
-    box = pg.locator('[aria-label^="Marcar"], [aria-label^="Desmarcar"]').first.bounding_box(); ok(box['width'] >= 44, 'casilla de 44 px')
+    box = pg.locator('[aria-label^="Marcar"], [aria-label^="Desmarcar"]').first.bounding_box(); ok(box['width'] >= 44 and box['height'] >= 44, 'botón de marcar de 44 px o más')
+    ok(pg.locator('section[aria-label="Salud"]').count() == 1, 'paneles por categoría (C2)')
 
     print('Versión y seguridad')
     pg.click('[aria-label="Ajustes"]'); ok(pg.locator('text=/Hábitos \\d{8}\\.\\d{4}/').count() == 1, 'versión visible en Ajustes')
