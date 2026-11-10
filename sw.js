@@ -1,5 +1,5 @@
 // Service worker de Hábitos
-const CACHE = 'habitos-20261110.1508' // lo pone la compilación (vite.config.js)
+const CACHE = 'habitos-20261110.1513' // lo pone la compilación (vite.config.js)
 const ARCHIVOS = ['./', 'index.html', 'manifest.json', 'icono-180.png', 'icono-192.png', 'icono-512.png']
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARCHIVOS.map((u) => new Request(u, { cache: 'reload' })))))

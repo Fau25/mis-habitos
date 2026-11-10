@@ -19,7 +19,7 @@ const remate = () => ({
     let html = readFileSync(p, 'utf8')
     const hashes = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].filter((m) => m[1].trim())
       .map((m) => `'sha256-${createHash('sha256').update(m[1]).digest('base64')}'`)
-    const csp = `default-src 'self'; script-src 'self' ${hashes.join(' ')}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'`
+    const csp = `default-src 'self'; script-src 'self' ${hashes.join(' ')}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self' blob:; base-uri 'none'; form-action 'none'; object-src 'none'`
     html = html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />`)
     writeFileSync(p, html)
     writeFileSync('dist/sw.js', readFileSync('dist/sw.js', 'utf8').replace('__CACHE__', `habitos-${VERSION}`))
