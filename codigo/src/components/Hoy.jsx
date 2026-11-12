@@ -4,6 +4,9 @@ import { CATEGORIAS, ORDEN_MOMENTO, tituloDe, tocaEl, hecho, rachaActual, resume
 import { DIAS, clave, sumarDias, hoy, lunesDe } from '../lib/fechas'
 import { IconoHabito } from './Habito'
 
+// Con ratón (ordenador) los textos de ayuda hablan de clic en vez de tocar
+const raton = typeof matchMedia === 'function' && matchMedia('(hover: hover) and (pointer: fine)').matches
+
 const fmt = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
 const catDe = (h) => (CATEGORIAS[h.categoria] ? h.categoria : 'otros')
 
@@ -93,7 +96,7 @@ export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
 
       <div className="mt-2 flex items-center justify-between gap-2 px-1">
         {!esHoy ? <button onClick={() => setDia(hoy())} className="min-h-9 rounded-lg bg-carta px-3 text-[13px] font-medium shadow-[0_0_0_1px_var(--color-linea)]">Volver a hoy</button>
-          : <p className="text-[11.5px] text-sec">{editar ? 'Toca un hábito para editarlo' : 'Toca para marcar · mantén pulsado para editar'}</p>}
+          : <p className="text-[11.5px] text-sec">{editar ? (raton ? 'Haz clic en un hábito para editarlo' : 'Toca un hábito para editarlo') : raton ? 'Clic para marcar · clic derecho para editar' : 'Toca para marcar · mantén pulsado para editar'}</p>}
         {habitos.length > 0 && (
           <button onClick={() => setEditar(!editar)} aria-pressed={editar} className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium ${editar ? 'bg-tinta text-white' : 'text-sec'}`}>
             <Pencil size={14} /> {editar ? 'Listo' : 'Editar'}

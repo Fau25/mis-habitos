@@ -11,7 +11,7 @@ const nivel = (p) => (p === 1 ? 4 : p >= 0.66 ? 3 : p >= 0.33 ? 2 : 1)
 const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short' })
 const mes = new Intl.DateTimeFormat('es-ES', { month: 'short' })
 
-export default function Estadisticas({ habitos: todos }) {
+export default function Estadisticas({ habitos: todos, compacta = false }) {
   const [filtro, setFiltro] = useState('todas')
   const presentes = Object.keys(CATEGORIAS).filter((k) => todos.some((h) => (CATEGORIAS[h.categoria] ? h.categoria : 'otros') === k))
   const elegida = presentes.includes(filtro) ? filtro : 'todas'
@@ -31,10 +31,11 @@ export default function Estadisticas({ habitos: todos }) {
 
   return (
     <>
+      {compacta ? <h2 className="px-1 text-[15px] font-semibold">Últimas {SEMANAS} semanas</h2> : (
       <header className="px-1">
         <p className="text-[13px] text-sec">Últimas {SEMANAS} semanas</p>
         <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight">Estadísticas</h1>
-      </header>
+      </header>)}
 
       {presentes.length > 1 && (
         <div className="-mx-4 mt-4 flex gap-1.5 overflow-x-auto px-4 pb-1" role="group" aria-label="Filtrar por categoría">
@@ -80,7 +81,7 @@ export default function Estadisticas({ habitos: todos }) {
         </div>
       </section>
 
-      {habitos.length > 0 && (
+      {habitos.length > 0 && !compacta && (
         <>
           <div className="mt-5 mb-2 flex justify-between px-1 text-[13px] text-sec"><span>Por hábito · 30 días</span><span>racha / récord</span></div>
           <ul className="overflow-hidden rounded-2xl border border-linea bg-carta">

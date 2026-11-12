@@ -8,6 +8,15 @@ import Hoy from './components/Hoy'
 import Estadisticas from './components/Estadisticas'
 import Ajustes from './components/Ajustes'
 import Formulario from './components/Formulario'
+import Semana from './components/Semana'
+
+// Escritorio: desde 1024 px se ve Hoy y, al lado, la semana y las estadísticas
+const MQ = typeof matchMedia === 'function' ? matchMedia('(min-width: 1024px)') : null
+function useEscritorio() {
+  const [pc, setPc] = useState(() => !!MQ?.matches)
+  useEffect(() => { if (!MQ) return; const f = () => setPc(MQ.matches); MQ.addEventListener('change', f); return () => MQ.removeEventListener('change', f) }, [])
+  return pc
+}
 
 const celebrar = () => {
   const o = { spread: 70, startVelocity: 38, ticks: 160, colors: ['#18181B', '#52525B', '#A1A1AA', '#D4D4D8'], disableForReducedMotion: true }
@@ -23,6 +32,7 @@ const AVISOS = {
 export default function App() {
   const { habitos, estado, guardar, borrar, alternar, reemplazar } = useHabitos()
   const [vista, setVista] = useState('hoy')
+  const pc = useEscritorio()
   const [editando, setEditando] = useState(null) // null = cerrado, {} = nuevo
   const [dia, setDia] = useState(hoy)
   const [aviso, setAviso] = useState(null) // { texto, deshacer? }
@@ -56,19 +66,24 @@ export default function App() {
   const abierto = !!editando
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-3 pt-5 pb-32">
+    <div className="mx-auto min-h-dvh max-w-lg px-3 pt-5 pb-32 lg:max-w-[1320px] lg:px-8 lg:pt-24 lg:pb-10">
       <main inert={abierto || undefined}>
         {AVISOS[estado] && (
           <p role="alert" className="mb-4 flex gap-2.5 rounded-2xl border border-tinta bg-carta p-3.5 text-sm">
             <TriangleAlert size={18} className="mt-0.5 shrink-0" aria-hidden="true" />{AVISOS[estado]}
           </p>
         )}
-        {vista === 'hoy' ? <Hoy habitos={habitos} dia={dia} setDia={setDia} alAlternar={(id) => alternar(id, dia)} alEditar={setEditando} />
+        {vista === 'hoy' && pc ? (
+          <div className="grid grid-cols-[minmax(0,1fr)_400px] items-start gap-8">
+            <div className="min-w-0"><Hoy habitos={habitos} dia={dia} setDia={setDia} alAlternar={(id) => alternar(id, dia)} alEditar={setEditando} /></div>
+            <aside className="flex flex-col gap-4 pt-1"><Semana habitos={habitos} alternar={alternar} /><Estadisticas habitos={habitos} compacta /></aside>
+          </div>)
+          : vista === 'hoy' ? <Hoy habitos={habitos} dia={dia} setDia={setDia} alAlternar={(id) => alternar(id, dia)} alEditar={setEditando} />
           : vista === 'stats' ? <Estadisticas habitos={habitos} />
           : <Ajustes habitos={habitos} reemplazar={reemplazar} avisar={avisar} />}
       </main>
 
-      <nav inert={abierto || undefined} className="fixed inset-x-0 bottom-0 z-20 flex justify-center gap-2.5 pb-[max(env(safe-area-inset-bottom),20px)]">
+      <nav inert={abierto || undefined} className="fixed inset-x-0 bottom-0 z-20 flex justify-center gap-2.5 pb-[max(env(safe-area-inset-bottom),20px)] lg:inset-x-auto lg:top-4 lg:right-8 lg:bottom-auto lg:pb-0">
         <div className="flex gap-1 rounded-2xl border border-linea bg-carta/90 p-1.5 shadow-lg shadow-black/5 backdrop-blur">
           {[['hoy', 'Hoy', House], ['stats', 'Estadísticas', ChartColumn], ['ajustes', 'Ajustes', Settings]].map(([k, l, I]) => (
             <button key={k} className={tab(vista === k)} onClick={() => setVista(k)} aria-label={l} aria-current={vista === k ? 'page' : undefined}><I size={21} strokeWidth={1.8} /></button>
@@ -79,7 +94,7 @@ export default function App() {
         </button>
       </nav>
 
-      <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[104px] z-30 flex justify-center px-4">
+      <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[104px] z-30 flex justify-center px-4 lg:bottom-8">
         {aviso && (
           <div className="pointer-events-auto flex items-center gap-3 rounded-xl bg-tinta py-1.5 pr-1.5 pl-4 text-sm text-white shadow-lg">
             <span className="py-1.5">{aviso.texto}</span>
