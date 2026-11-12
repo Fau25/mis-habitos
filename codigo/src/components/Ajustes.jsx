@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Download, Upload, RotateCcw } from 'lucide-react'
-import { valido, leerCopias, hayAlmacen } from '../lib/useHabitos'
+import { valido, leerCopias, hayAlmacen, SYNC, useSyncEstado } from '../lib/useHabitos'
 
 const fmt = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
 const Carta = ({ titulo, children }) => (
@@ -10,6 +10,55 @@ const Carta = ({ titulo, children }) => (
   </section>
 )
 const boton = 'flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium'
+
+const hora = (d) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+function textoSync(e) {
+  if (e.t === 'ok') return 'Sincronizado a las ' + hora(e.x)
+  if (e.t === 'sync') return 'Sincronizando…'
+  if (e.t === 'error') return 'No se pudo sincronizar: ' + e.x
+  return ''
+}
+
+function Sincronizacion({ avisar }) {
+  const e = useSyncEstado()
+  const [url, setUrl] = useState('')
+  const [clave, setClave] = useState('')
+  const [conectando, setConectando] = useState(false)
+  const [fallo, setFallo] = useState('')
+  const [, refrescar] = useState(0)
+  const conectar = async (ev) => {
+    ev.preventDefault(); setFallo(''); setConectando(true)
+    try { await SYNC.conectar(url, clave); setClave(''); avisar('Sincronización activada') }
+    catch (err) { setFallo(err.message) }
+    finally { setConectando(false) }
+  }
+  const campo = 'mt-1 h-12 w-full rounded-xl border border-linea bg-fondo px-3 text-base'
+  if (SYNC.conectado) return (
+    <Carta titulo="Sincronización">
+      <p className="mt-1 text-sm text-sec">Tus hábitos se guardan en tu Google Drive y se comparten entre tus dispositivos.</p>
+      <p role="status" className={`mt-2 text-sm ${e.t === 'error' ? 'text-red-700' : 'text-sec'}`}>{textoSync(e)}</p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button onClick={() => SYNC.sincronizar()} className={`${boton} bg-pista`}>Sincronizar ahora</button>
+        <button onClick={() => { if (confirm('¿Desconectar la sincronización? Los hábitos se quedan en este dispositivo y en Drive.')) { SYNC.desconectar(); refrescar((n) => n + 1) } }} className={`${boton} bg-pista`}>Desconectar</button>
+      </div>
+    </Carta>
+  )
+  return (
+    <Carta titulo="Sincronización">
+      <form onSubmit={conectar}>
+        <p className="mt-1 text-sm text-sec">Conecta tu script de Google «Hábitos» para tener los mismos hábitos en el iPhone, el iPad y el PC.</p>
+        <label className="mt-3 block text-[13px] text-sec">Dirección del script (acaba en /exec)
+          <input type="url" value={url} onChange={(x) => setUrl(x.target.value)} autoComplete="off" spellCheck="false" placeholder="https://script.google.com/macros/s/…/exec" className={campo} />
+        </label>
+        <label className="mt-3 block text-[13px] text-sec">Contraseña del script
+          <input type="password" value={clave} onChange={(x) => setClave(x.target.value)} autoComplete="off" className={campo} />
+        </label>
+        {(fallo || e.t === 'error') && <p role="status" className="mt-2 text-sm text-red-700">{fallo || textoSync(e)}</p>}
+        <button disabled={conectando || !url || !clave} className={`${boton} mt-3 w-full bg-tinta text-white disabled:opacity-35`}>{conectando ? 'Conectando…' : 'Conectar'}</button>
+      </form>
+    </Carta>
+  )
+}
 
 export default function Ajustes({ habitos, reemplazar, avisar }) {
   const archivo = useRef(null)
@@ -48,8 +97,10 @@ export default function Ajustes({ habitos, reemplazar, avisar }) {
         <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight">Ajustes</h1>
       </header>
 
+      <Sincronizacion avisar={avisar} />
+
       <Carta titulo="Copia de seguridad">
-        <p className="mt-1 text-sm text-sec">Tus hábitos solo se guardan en este navegador. Guarda una copia de vez en cuando (por ejemplo en Archivos o iCloud Drive).</p>
+        <p className="mt-1 text-sm text-sec">{SYNC.conectado ? 'Además de Drive, puedes guardar una copia en un archivo.' : 'Tus hábitos solo se guardan en este navegador. Guarda una copia de vez en cuando (por ejemplo en Archivos o iCloud Drive).'}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <button onClick={exportar} disabled={!habitos.length} className={`${boton} bg-tinta text-white disabled:opacity-35`}><Download size={17} /> Exportar</button>
           <button onClick={() => archivo.current?.click()} className={`${boton} bg-pista`}><Upload size={17} /> Importar</button>

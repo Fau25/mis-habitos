@@ -84,6 +84,28 @@ with sync_playwright() as p:
     print('Versión y seguridad')
     pg.click('[aria-label="Ajustes"]'); ok(pg.locator('text=/Hábitos \\d{8}\\.\\d{4}/').count() == 1, 'versión visible en Ajustes')
     ok(pg.evaluate("!!document.querySelector('meta[http-equiv=Content-Security-Policy]')"), 'CSP presente')
+    print('Sincronización (dos dispositivos, Code.gs real con Drive simulado)')
+    import urllib.request
+    gas = subprocess.Popen(['node', os.path.join(os.path.dirname(__file__), '..', 'sincronizacion', 'servidor-falso.cjs'), '8792']); time.sleep(1)
+    def falso(route):
+        r = route.request
+        route.fulfill(status=200, content_type='application/json', body=urllib.request.urlopen(urllib.request.Request('http://localhost:8792/', data=(r.post_data or '').encode(), method=r.method)).read())
+    SURL = 'https://script.google.com/macros/s/PRUEBA_1/exec'
+    def disp():
+        c = b.new_context(viewport={'width': 390, 'height': 844}); c.route('https://script.google.com/**', falso)
+        q = c.new_page(); q.on('pageerror', lambda e: errs.append(str(e))); q.goto(URL); return q
+    def conectar(q, clave='secreta'):
+        q.click('[aria-label="Ajustes"]'); q.fill('input[type=url]', SURL); q.fill('input[type=password]', clave); q.click('button:has-text("Conectar")'); q.wait_for_timeout(1500)
+    A = disp(); poner(A, [hab('a', 'Agua', hechos={K(1): 1})])
+    conectar(A, 'mala'); ok('incorrecta' in A.inner_text('main'), 'contraseña mala: aviso claro')
+    A.fill('input[type=password]', 'secreta'); A.click('button:has-text("Conectar")'); A.wait_for_timeout(1500)
+    ok('Sincronizado' in A.inner_text('main'), 'conectar sube los hábitos')
+    B = disp(); conectar(B)
+    hb = datos(B); ok([h['nombre'] for h in hb] == ['Agua'] and K(1) in hb[0]['hechos'], 'dispositivo nuevo: recibe los hábitos y descarta los de ejemplo')
+    B.click('[aria-label="Hoy"]'); B.click('[aria-label="Marcar Agua"]'); B.wait_for_timeout(3000)
+    A.evaluate("localStorage.getItem('x')"); A.click('[aria-label="Sincronizar ahora"], button:has-text("Sincronizar ahora")'); A.wait_for_timeout(1500)
+    ok(str(hoy) in datos(A)[0]['hechos'] and K(1) in datos(A)[0]['hechos'], 'lo marcado en un dispositivo llega al otro')
+    gas.terminate()
     ok(not errs, 'sin errores en consola ' + (str(errs) if errs else ''))
     b.close()
 if srv: srv.terminate()

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { clave, hoy, sumarDias } from './fechas'
+import crearSync from './sync'
 
 export const LS = 'habitos-v1'
 const COPIAS = 'habitos-copias'   // copias automáticas diarias (las 3 últimas)
@@ -31,10 +32,56 @@ const ejemplos = () => {
 
 export const leerCopias = () => { try { return JSON.parse(ls?.getItem(COPIAS)) ?? [] } catch { return [] } }
 
+// ---- Sincronización con Google Drive (opcional, en Ajustes) ----
+// Cada hábito es un elemento «h:id» y cada día hecho uno «x:id:AAAA-MM-DD»,
+// así marcar en dos dispositivos a la vez no pisa nada.
+let actuales = [], bloqueado = false, soloEjemplos = false, aplicar = null
+let syncEstado = { t: 'off' }
+const oyentes = new Set()
+function itemsDe(hs) {
+  const m = {}
+  for (const h of hs) {
+    const { hechos, ...resto } = h
+    m['h:' + h.id] = resto
+    for (const f in hechos) if (hechos[f]) m['x:' + h.id + ':' + f] = 1
+  }
+  return m
+}
+function habitosDe(m, previos) {
+  const porId = {}
+  for (const k in m) if (k.startsWith('h:')) porId[k.slice(2)] = { ...m[k], hechos: {} }
+  for (const k in m) {
+    if (!k.startsWith('x:')) continue
+    const i = k.lastIndexOf(':'), id = k.slice(2, i)
+    if (porId[id]) porId[id].hechos[k.slice(i + 1)] = 1
+  }
+  const orden = previos.map((h) => h.id).filter((id) => porId[id])
+  const nuevos = Object.keys(porId).filter((id) => !orden.includes(id)).sort((a, b) => (porId[a].creado < porId[b].creado ? -1 : 1))
+  return [...orden, ...nuevos].map((id) => porId[id])
+}
+export const SYNC = crearSync({
+  app: 'habitos',
+  aItems: () => { if (bloqueado) throw new Error('Los datos de este dispositivo están dañados: restaura una copia antes de sincronizar'); return itemsDe(actuales) },
+  deItems: (m) => aplicar && aplicar(m),
+  esNuevo: () => soloEjemplos || !actuales.length,
+  estado: (t, x) => { syncEstado = { t, x }; oyentes.forEach((f) => f(syncEstado)) },
+})
+export function useSyncEstado() {
+  const [e, setE] = useState(syncEstado)
+  useEffect(() => { oyentes.add(setE); return () => oyentes.delete(setE) }, [])
+  return e
+}
+
 export function useHabitos() {
   const [{ habitos, estado }, setTodo] = useState(cargar)
   const setHabitos = useCallback((f) => setTodo((t) => ({ ...t, habitos: typeof f === 'function' ? f(t.habitos) : f })), [])
   const cambiado = useRef(false)
+
+  actuales = habitos
+  bloqueado = estado === 'danado' && !cambiado.current
+  soloEjemplos = estado === 'nuevo' && !cambiado.current
+  aplicar = (m) => { cambiado.current = true; setTodo((t) => ({ habitos: habitosDe(m, t.habitos), estado: 'ok' })) }
+  useEffect(() => { SYNC.iniciar() }, [])
 
   // Copia automática: una por día, antes de tocar nada; se guardan las 3 últimas
   useEffect(() => {
@@ -57,7 +104,7 @@ export function useHabitos() {
     return () => removeEventListener('storage', f)
   }, [])
 
-  const tocar = (f) => { cambiado.current = true; setHabitos(f) }
+  const tocar = (f) => { cambiado.current = true; setHabitos(f); SYNC.avisarCambio() }
 
   const guardar = useCallback((h) => tocar((hs) => {
     const viejo = hs.find((x) => x.id === h.id)
@@ -84,7 +131,7 @@ export function useHabitos() {
     return { ...x, hechos }
   })), []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const reemplazar = useCallback((hs) => { cambiado.current = true; setTodo({ habitos: hs, estado: 'ok' }) }, [])
+  const reemplazar = useCallback((hs) => { cambiado.current = true; setTodo({ habitos: hs, estado: 'ok' }); SYNC.avisarCambio() }, [])
 
   return { habitos, estado, guardar, borrar, alternar, reemplazar }
 }
