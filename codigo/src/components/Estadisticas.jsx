@@ -4,7 +4,7 @@ import { IconoHabito } from './Habito'
 import { DIAS, clave, sumarDias, hoy, lunesDe } from '../lib/fechas'
 
 const SEMANAS = 20
-const NIVELES = ['#EEEEEC', '#BDBDC4', '#8E8E96', '#52525B', '#18181B']
+const NIVELES = ['rgba(42,36,51,.06)', '#D9D0F2', '#B3A4E6', '#7A68C9', '#2A2433']
 // Escala de una categoría: vacío → pastel → … → tono fuerte de la categoría
 const escala = (c) => ['#EEEEEC', mezcla(c.suave, c.fuerte, 0.12), mezcla(c.suave, c.fuerte, 0.4), mezcla(c.suave, c.fuerte, 0.7), c.fuerte]
 const nivel = (p) => (p === 1 ? 4 : p >= 0.66 ? 3 : p >= 0.33 ? 2 : 1)
@@ -43,7 +43,7 @@ export default function Estadisticas({ habitos: todos, compacta = false }) {
             const c = CATEGORIAS[k], on = elegida === k
             return (
               <button key={k} onClick={() => setFiltro(k)} aria-pressed={on}
-                className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] ${!c && on ? 'bg-tinta text-white' : !c ? 'bg-pista text-sec' : 'text-tinta'}`}
+                className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] ${!c && on ? 'bg-acento text-tinta' : !c ? 'bg-pista text-sec' : 'text-tinta'}`}
                 style={c ? { background: c.suave, boxShadow: on ? `inset 0 0 0 1.5px ${c.fuerte}` : undefined, fontWeight: on ? 600 : 400 } : undefined}>
                 {c && <span className="size-2 rounded-full" style={{ background: c.fuerte }} />}{c ? c.nombre : 'Todas'}
               </button>

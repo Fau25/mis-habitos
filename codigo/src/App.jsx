@@ -19,7 +19,7 @@ function useEscritorio() {
 }
 
 const celebrar = () => {
-  const o = { spread: 70, startVelocity: 38, ticks: 160, colors: ['#18181B', '#52525B', '#A1A1AA', '#D4D4D8'], disableForReducedMotion: true }
+  const o = { spread: 70, startVelocity: 38, ticks: 160, colors: ['#D3C6FF', '#B5E9D8', '#FFCBB3', '#F8E7B0', '#2A2433'], disableForReducedMotion: true }
   confetti({ ...o, particleCount: 80, origin: { x: 0.25, y: 0.75 }, angle: 60 })
   confetti({ ...o, particleCount: 80, origin: { x: 0.75, y: 0.75 }, angle: 120 })
 }
@@ -62,7 +62,7 @@ export default function App() {
   }, [habitos])
 
   const cerrar = useCallback(() => setEditando(null), [])
-  const tab = (on) => `grid size-11 place-items-center rounded-xl ${on ? 'bg-pista text-tinta' : 'text-sec'}`
+  const tab = (on) => `grid size-11 place-items-center rounded-full ${on ? 'bg-acento text-tinta' : 'text-sec'}`
   const abierto = !!editando
 
   return (
@@ -84,12 +84,12 @@ export default function App() {
       </main>
 
       <nav inert={abierto || undefined} className="fixed inset-x-0 bottom-0 z-20 flex justify-center gap-2.5 pb-[max(env(safe-area-inset-bottom),20px)] lg:inset-x-auto lg:top-4 lg:right-8 lg:bottom-auto lg:pb-0">
-        <div className="flex gap-1 rounded-2xl border border-linea bg-carta/90 p-1.5 shadow-lg shadow-black/5 backdrop-blur">
+        <div className="flex gap-1 rounded-full border border-white/95 bg-white/70 p-1.5 shadow-[0_10px_30px_rgba(120,100,140,.14)] backdrop-blur-xl">
           {[['hoy', 'Hoy', House], ['stats', 'Estadísticas', ChartColumn], ['ajustes', 'Ajustes', Settings]].map(([k, l, I]) => (
             <button key={k} className={tab(vista === k)} onClick={() => setVista(k)} aria-label={l} aria-current={vista === k ? 'page' : undefined}><I size={21} strokeWidth={1.8} /></button>
           ))}
         </div>
-        <button onClick={() => setEditando({})} aria-label="Nuevo hábito" className="grid size-[58px] place-items-center rounded-2xl bg-tinta text-white shadow-lg shadow-black/15 active:scale-95">
+        <button onClick={() => setEditando({})} aria-label="Nuevo hábito" className="grid size-[58px] place-items-center rounded-full bg-acento text-tinta shadow-lg shadow-[#FFA07A]/25 active:scale-95">
           <Plus size={24} strokeWidth={2} />
         </button>
       </nav>

@@ -99,4 +99,4 @@ export function porcentaje(h, n = 30) {
 // Mezcla dos colores #rrggbb (t = 0 → a, 1 → b)
 export const mezcla = (a, b, t) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t) + parseInt(b.slice(i, i + 2), 16) * t).toString(16).padStart(2, '0')).join('')
 // Texto sobre el fondo pastel de la categoría (≥ 4,5:1)
-export const tituloDe = (c) => mezcla(c.fuerte, '#18181B', 0.25)
+export const tituloDe = (c) => mezcla(c.fuerte, '#2A2433', 0.25)

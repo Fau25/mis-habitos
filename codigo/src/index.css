@@ -1,20 +1,31 @@
 @import "tailwindcss";
 
-@font-face { font-family: "Inter Variable"; font-weight: 100 900; font-display: block;
-  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2"); }
-@font-face { font-family: "JetBrains Mono"; font-weight: 400; font-display: block;
-  src: url("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Sora"; font-weight: 400; font-display: block; src: url("./fuentes/sora-400.woff2") format("woff2"); }
+@font-face { font-family: "Sora"; font-weight: 500; font-display: block; src: url("./fuentes/sora-500.woff2") format("woff2"); }
+@font-face { font-family: "Sora"; font-weight: 600; font-display: block; src: url("./fuentes/sora-600.woff2") format("woff2"); }
+@font-face { font-family: "Sora"; font-weight: 700; font-display: block; src: url("./fuentes/sora-700.woff2") format("woff2"); }
 
-/* Grafito claro: neutros, el negro es el único acento */
+/* «Aurora · Alba» (el mismo estilo que Mis apps y Mi Día): fondo claro con brumas lavanda, menta y melocotón,
+   cristal blanco, todo en Sora (jerarquía por pesos) y acento melocotón mate. Las categorías siguen en pastel. */
 @theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --color-fondo: #F5F5F4; --color-carta: #FFFFFF; --color-tinta: #18181B; --color-sec: #66666E;
-  --color-linea: #E7E5E4; --color-pista: #EEEEEC; --color-medio: #A1A1AA;
+  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --color-fondo: #F3EEF1; --color-carta: rgba(255,255,255,.62); --color-tinta: #2A2433; --color-sec: #857D92;
+  --color-linea: rgba(42,36,51,.09); --color-pista: rgba(42,36,51,.06); --color-medio: #B4ACC0;
+  --color-acento: #FFCBB3;
 }
 
 html { -webkit-tap-highlight-color: transparent; color-scheme: light; }
-body { @apply bg-fondo font-sans text-tinta antialiased; }
+body { @apply bg-fondo font-sans text-tinta antialiased; letter-spacing: -.01em;
+  background-image: radial-gradient(60% 40% at 8% 4%, rgba(190,172,255,.5), transparent 70%), radial-gradient(50% 35% at 96% 22%, rgba(160,226,205,.4), transparent 70%),
+    radial-gradient(55% 40% at 70% 102%, rgba(255,186,164,.45), transparent 70%);
+  background-attachment: fixed; min-height: 100dvh; }
+.font-mono { font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+h1, h2 { letter-spacing: -.035em; }
+/* cristal: las tarjetas blancas pasan a ser translúcidas con borde blanco */
+.bg-carta { -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
+.border.border-linea.bg-carta, .border-linea.bg-carta\/90 { border-color: rgba(255,255,255,.95); box-shadow: 0 10px 30px rgba(120,100,140,.10); }
+.sube { background: #FBF8FA; }
 input, textarea { font-size: 16px; }
 
 @keyframes pop { 0% { transform: scale(1) } 40% { transform: scale(1.18) } 100% { transform: scale(1) } }

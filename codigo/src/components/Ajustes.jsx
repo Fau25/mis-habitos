@@ -54,7 +54,7 @@ function Sincronizacion({ avisar }) {
           <input type="password" value={clave} onChange={(x) => setClave(x.target.value)} autoComplete="off" className={campo} />
         </label>
         {(fallo || e.t === 'error') && <p role="status" className="mt-2 text-sm text-red-700">{fallo || textoSync(e)}</p>}
-        <button disabled={conectando || !url || !clave} className={`${boton} mt-3 w-full bg-tinta text-white disabled:opacity-35`}>{conectando ? 'Conectando…' : 'Conectar'}</button>
+        <button disabled={conectando || !url || !clave} className={`${boton} mt-3 w-full bg-acento text-tinta disabled:opacity-35`}>{conectando ? 'Conectando…' : 'Conectar'}</button>
       </form>
     </Carta>
   )
@@ -102,7 +102,7 @@ export default function Ajustes({ habitos, reemplazar, avisar }) {
       <Carta titulo="Copia de seguridad">
         <p className="mt-1 text-sm text-sec">{SYNC.conectado ? 'Además de Drive, puedes guardar una copia en un archivo.' : 'Tus hábitos solo se guardan en este navegador. Guarda una copia de vez en cuando (por ejemplo en Archivos o iCloud Drive).'}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <button onClick={exportar} disabled={!habitos.length} className={`${boton} bg-tinta text-white disabled:opacity-35`}><Download size={17} /> Exportar</button>
+          <button onClick={exportar} disabled={!habitos.length} className={`${boton} bg-acento text-tinta disabled:opacity-35`}><Download size={17} /> Exportar</button>
           <button onClick={() => archivo.current?.click()} className={`${boton} bg-pista`}><Upload size={17} /> Importar</button>
         </div>
         <input ref={archivo} type="file" accept="application/json,.json" className="hidden" onChange={leerArchivo} aria-label="Elegir copia para importar" />
@@ -112,7 +112,7 @@ export default function Ajustes({ habitos, reemplazar, avisar }) {
         <div role="alert" className="mt-3 rounded-2xl border border-tinta bg-carta p-4 text-sm">
           <p>Vas a sustituir tus hábitos actuales por {pendiente.origen}. Lo de ahora se perderá si no lo has exportado.</p>
           <div className="mt-3 flex gap-2">
-            <button onClick={confirmar} className={`${boton} flex-1 bg-tinta text-white`}>Sustituir</button>
+            <button onClick={confirmar} className={`${boton} flex-1 bg-acento text-tinta`}>Sustituir</button>
             <button onClick={() => setPendiente(null)} className={`${boton} flex-1 bg-pista`}>Cancelar</button>
           </div>
         </div>

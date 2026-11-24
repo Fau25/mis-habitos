@@ -43,7 +43,7 @@ function Icono({ h, c, ok, racha, editar, alAlternar, alEditar }) {
               <Check size={11} strokeWidth={3.2} />
             </span>
           )}
-          {editar && <span className="absolute -top-1 -right-1 grid size-[18px] place-items-center rounded-full bg-tinta text-white"><Pencil size={10} strokeWidth={2.4} /></span>}
+          {editar && <span className="absolute -top-1 -right-1 grid size-[18px] place-items-center rounded-full bg-acento text-tinta"><Pencil size={10} strokeWidth={2.4} /></span>}
         </span>
         <span className="line-clamp-2 h-[26px] px-0.5 text-center text-[11px] leading-[13px] text-tinta">{h.nombre}</span>
       </button>
@@ -98,7 +98,7 @@ export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
         {!esHoy ? <button onClick={() => setDia(hoy())} className="min-h-9 rounded-lg bg-carta px-3 text-[13px] font-medium shadow-[0_0_0_1px_var(--color-linea)]">Volver a hoy</button>
           : <p className="text-[11.5px] text-sec">{editar ? (raton ? 'Haz clic en un hábito para editarlo' : 'Toca un hábito para editarlo') : raton ? 'Clic para marcar · clic derecho para editar' : 'Toca para marcar · mantén pulsado para editar'}</p>}
         {habitos.length > 0 && (
-          <button onClick={() => setEditar(!editar)} aria-pressed={editar} className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium ${editar ? 'bg-tinta text-white' : 'text-sec'}`}>
+          <button onClick={() => setEditar(!editar)} aria-pressed={editar} className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium ${editar ? 'bg-acento text-tinta' : 'text-sec'}`}>
             <Pencil size={14} /> {editar ? 'Listo' : 'Editar'}
           </button>
         )}

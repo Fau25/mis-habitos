@@ -5,7 +5,7 @@ import { DIAS } from '../lib/fechas'
 
 const Etiqueta = ({ children }) => <span className="mb-1.5 block text-xs font-medium text-sec">{children}</span>
 const campo = 'w-full rounded-xl border border-linea bg-fondo px-3.5 py-3 outline-none focus:border-tinta'
-const chip = (on) => `rounded-xl px-3 py-2.5 text-sm transition-colors ${on ? 'bg-tinta text-white' : 'bg-pista text-sec'}`
+const chip = (on) => `rounded-xl px-3 py-2.5 text-sm transition-colors ${on ? 'bg-acento text-tinta' : 'bg-pista text-sec'}`
 
 export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
   const nuevo = !inicial?.id
@@ -103,7 +103,7 @@ export default function Formulario({ inicial, alGuardar, alBorrar, alCerrar }) {
               <Trash2 size={16} />{confirmar ? '¿Seguro?' : 'Eliminar'}
             </button>
           )}
-          <button type="submit" disabled={!valido} className="flex-1 rounded-xl bg-tinta px-4 py-3 font-medium text-white disabled:opacity-35">
+          <button type="submit" disabled={!valido} className="flex-1 rounded-xl bg-acento px-4 py-3 font-semibold text-tinta disabled:opacity-35">
             {nuevo ? 'Crear hábito' : 'Guardar'}
           </button>
         </div>
