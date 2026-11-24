@@ -99,7 +99,7 @@ export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
         {!esHoy ? <button onClick={() => setDia(hoy())} className="min-h-9 rounded-lg bg-carta px-3 text-[13px] font-medium shadow-[0_0_0_1px_var(--color-linea)]">Volver a hoy</button>
           : <p className="text-[11.5px] text-sec">{editar ? (raton ? 'Haz clic en un hábito para editarlo' : 'Toca un hábito para editarlo') : raton ? 'Clic para marcar · clic derecho para editar' : 'Toca para marcar · mantén pulsado para editar'}</p>}
         {habitos.length > 0 && (
-          <button onClick={() => setEditar(!editar)} aria-pressed={editar} className={`flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium ${editar ? 'bg-acento text-tinta' : 'text-sec'}`}>
+          <button onClick={() => setEditar(!editar)} aria-pressed={editar} className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium ${editar ? 'bg-acento text-tinta' : 'text-sec'}`}>
             <Pencil size={14} /> {editar ? 'Listo' : 'Editar'}
           </button>
         )}
@@ -134,7 +134,7 @@ export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
               const c = CATEGORIAS[catDe(h)]
               return (
                 <li key={h.id}>
-                  <button onClick={() => alEditar(h)} aria-label={`Editar ${h.nombre}`} className="flex min-h-9 items-center gap-1.5 rounded-full bg-carta py-1 pr-3 pl-1.5 text-xs shadow-[0_0_0_1px_var(--color-linea)]">
+                  <button onClick={() => alEditar(h)} aria-label={`Editar ${h.nombre}`} className="flex min-h-11 items-center gap-1.5 rounded-full bg-carta py-1 pr-3 pl-1.5 text-xs shadow-[0_0_0_1px_var(--color-linea)]">
                     <span className="grid size-6 place-items-center rounded-full" style={{ background: c.suave, color: c.fuerte }}><IconoHabito h={h} size={13} /></span>{h.nombre}
                   </button>
                 </li>
