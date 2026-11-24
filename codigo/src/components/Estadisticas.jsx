@@ -34,7 +34,7 @@ export default function Estadisticas({ habitos: todos, compacta = false }) {
       {compacta ? <h2 className="px-1 text-[15px] font-semibold">Últimas {SEMANAS} semanas</h2> : (
       <header className="px-1">
         <p className="text-[13px] text-sec">Últimas {SEMANAS} semanas</p>
-        <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight">Estadísticas</h1>
+        <h1 className="mt-0.5 text-[30px] leading-tight font-semibold tracking-tight">Estadísticas</h1>
       </header>)}
 
       {presentes.length > 1 && (

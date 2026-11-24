@@ -62,11 +62,12 @@ export default function App() {
   }, [habitos])
 
   const cerrar = useCallback(() => setEditando(null), [])
-  const tab = (on) => `grid size-11 place-items-center rounded-full ${on ? 'bg-acento text-tinta' : 'text-sec'}`
+  // Menú común de todas las apps: píldora de cristal con icono + nombre; la activa en melocotón
+  const tab = (on) => `flex h-[52px] min-w-16 flex-col items-center justify-center gap-0.5 rounded-full px-4 text-[11px] font-semibold ${on ? 'bg-acento text-tinta' : 'text-sec'}`
   const abierto = !!editando
 
   return (
-    <div className="mx-auto min-h-dvh max-w-lg px-3 pt-5 pb-32 lg:max-w-[1320px] lg:px-8 lg:pt-24 lg:pb-10">
+    <div className="relative mx-auto min-h-dvh max-w-lg px-3 pt-5 pb-32 lg:max-w-[1320px] lg:px-8 lg:pt-24 lg:pb-10">
       <main inert={abierto || undefined}>
         {AVISOS[estado] && (
           <p role="alert" className="mb-4 flex gap-2.5 rounded-2xl border border-tinta bg-carta p-3.5 text-sm">
@@ -83,18 +84,24 @@ export default function App() {
           : <Ajustes habitos={habitos} reemplazar={reemplazar} avisar={avisar} />}
       </main>
 
-      <nav inert={abierto || undefined} className="fixed inset-x-0 bottom-0 z-20 flex justify-center gap-2.5 pb-[max(env(safe-area-inset-bottom),20px)] lg:inset-x-auto lg:top-4 lg:right-8 lg:bottom-auto lg:pb-0">
-        <div className="flex gap-1 rounded-full border border-white/95 bg-white/70 p-1.5 shadow-[0_10px_30px_rgba(120,100,140,.14)] backdrop-blur-xl">
-          {[['hoy', 'Hoy', House], ['stats', 'Estadísticas', ChartColumn], ['ajustes', 'Ajustes', Settings]].map(([k, l, I]) => (
-            <button key={k} className={tab(vista === k)} onClick={() => setVista(k)} aria-label={l} aria-current={vista === k ? 'page' : undefined}><I size={21} strokeWidth={1.8} /></button>
+      {/* Ajustes arriba a la derecha (en el móvil); en el ordenador va en el menú de arriba */}
+      {!pc && <button inert={abierto || undefined} onClick={() => setVista(vista === 'ajustes' ? 'hoy' : 'ajustes')} aria-label="Ajustes" aria-current={vista === 'ajustes' ? 'page' : undefined}
+        className={`absolute top-4 right-3 z-10 grid size-11 place-items-center rounded-full border border-white/95 shadow-[0_6px_18px_rgba(120,100,140,.12)] ${vista === 'ajustes' ? 'bg-acento text-tinta' : 'bg-white/70 text-tinta'}`}>
+        <Settings size={20} strokeWidth={1.8} />
+      </button>}
+
+      <nav inert={abierto || undefined} className="fixed inset-x-0 bottom-[calc(14px+env(safe-area-inset-bottom))] z-20 flex items-center justify-center gap-2.5 lg:inset-x-auto lg:top-4 lg:right-8 lg:bottom-auto">
+        <div className="flex gap-1 rounded-full border border-white/95 bg-white/70 p-[5px] shadow-[0_10px_30px_rgba(120,100,140,.14)] backdrop-blur-xl">
+          {[['hoy', 'Hoy', House], ['stats', 'Estadísticas', ChartColumn], ...(pc ? [['ajustes', 'Ajustes', Settings]] : [])].map(([k, l, I]) => (
+            <button key={k} className={tab(vista === k)} onClick={() => setVista(k)} aria-label={l} aria-current={vista === k ? 'page' : undefined}><I size={20} strokeWidth={1.8} aria-hidden="true" />{l}</button>
           ))}
         </div>
-        <button onClick={() => setEditando({})} aria-label="Nuevo hábito" className="grid size-[58px] place-items-center rounded-full bg-acento text-tinta shadow-lg shadow-[#FFA07A]/25 active:scale-95">
+        <button onClick={() => setEditando({})} aria-label="Nuevo hábito" className="grid size-14 place-items-center rounded-full bg-acento text-tinta shadow-[0_10px_30px_rgba(255,160,122,.3)] active:scale-95">
           <Plus size={24} strokeWidth={2} />
         </button>
       </nav>
 
-      <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[104px] z-30 flex justify-center px-4 lg:bottom-8">
+      <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(84px+env(safe-area-inset-bottom))] z-30 flex justify-center px-4 lg:bottom-8">
         {aviso && (
           <div className="pointer-events-auto flex items-center gap-3 rounded-xl bg-tinta py-1.5 pr-1.5 pl-4 text-sm text-white shadow-lg">
             <span className="py-1.5">{aviso.texto}</span>

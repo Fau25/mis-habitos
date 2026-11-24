@@ -94,7 +94,7 @@ export default function Ajustes({ habitos, reemplazar, avisar }) {
     <>
       <header className="px-1">
         <p className="text-[13px] text-sec">Tus datos y la app</p>
-        <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight">Ajustes</h1>
+        <h1 className="mt-0.5 text-[30px] leading-tight font-semibold tracking-tight">Ajustes</h1>
       </header>
 
       <Sincronizacion avisar={avisar} />

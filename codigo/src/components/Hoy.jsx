@@ -66,23 +66,24 @@ export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
   return (
     <>
       <header>
-        <div className="flex items-center justify-between gap-2 px-1">
-          <h1 className="min-w-0 truncate text-[22px] font-semibold tracking-tight">
-            {esHoy ? 'Hoy' : 'Corrigiendo'} <span className="text-[13px] font-normal text-sec">· {fmt.format(dia)}</span>
+        <div className="px-1 pr-14 lg:pr-1">
+          <p className="text-[13px] text-sec first-letter:uppercase">{fmt.format(dia)}</p>
+          <h1 className="mt-0.5 flex items-baseline gap-2.5 text-[30px] leading-tight font-semibold tracking-tight">
+            {esHoy ? 'Hoy' : 'Corrigiendo'}
+            {total > 0 && <span className="text-[13px] font-medium tracking-normal text-sec">{hechos} de {total} · <span className="text-tinta">{pct}%</span></span>}
           </h1>
-          <p className="shrink-0 font-mono text-xs text-sec">{total ? <>{hechos}/{total} · <span className="text-tinta">{pct}%</span></> : 'sin hábitos'}</p>
         </div>
 
         <div className="mt-2.5 flex items-center gap-0.5">
           <button onClick={() => setDia(sumarDias(lunes, -1))} disabled={clave(lunes) <= primera} aria-label="Semana anterior"
-            className="grid h-11 w-6 shrink-0 place-items-center text-sec disabled:opacity-25"><ChevronLeft size={18} /></button>
+            className="-ml-2 grid size-11 shrink-0 place-items-center rounded-full text-sec disabled:opacity-25"><ChevronLeft size={20} /></button>
           <div className="grid flex-1 grid-cols-7 gap-0.5" role="group" aria-label="Días de la semana">
             {semana.map((d, i) => {
               const k = clave(d), futuro = k > hoyK, sel = k === clave(dia), r = resumenDia(habitos, d)
               return (
                 <button key={k} disabled={futuro} onClick={() => setDia(d)} aria-pressed={sel}
                   className={`flex flex-col items-center gap-1 rounded-[10px] py-1.5 disabled:opacity-35 ${sel ? 'bg-carta shadow-[0_0_0_1px_var(--color-linea)]' : ''}`}>
-                  <span className={`text-[10px] ${sel ? 'font-semibold' : 'text-sec'}`}>{DIAS[i].corto}<span className="sr-only"> {d.getDate()}</span></span>
+                  <span className={`text-xs ${sel ? 'font-semibold' : 'text-sec'}`}>{DIAS[i].corto}<span className="sr-only"> {d.getDate()}</span></span>
                   <Aro p={futuro || !r.total ? 0 : r.hechos / r.total} />
                   <span className="sr-only">, {DIAS[i].largo}: {r.hechos} de {r.total}</span>
                 </button>
@@ -90,7 +91,7 @@ export default function Hoy({ habitos, dia, setDia, alAlternar, alEditar }) {
             })}
           </div>
           <button onClick={() => setDia(clave(sumarDias(lunes, 7)) > hoyK ? hoy() : sumarDias(lunes, 7))} disabled={clave(sumarDias(lunes, 6)) >= hoyK} aria-label="Semana siguiente"
-            className="grid h-11 w-6 shrink-0 place-items-center text-sec disabled:opacity-25"><ChevronRight size={18} /></button>
+            className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-sec disabled:opacity-25"><ChevronRight size={20} /></button>
         </div>
       </header>
 
